@@ -1,24 +1,17 @@
 # gen711_final
 
-<details>
-
-<summary> Background </summary>
-
 ## Background
 
-</details>
-
-<details>
-
-<summary> Methods </summary>
 
 ## Methods
 
 <details>
 
-<summary> Downloading Data </summary>
+<summary style="font-size: 18px;"> Downloading Data </summary>
 
-### Downloading data
+<details>
+
+<summary style="font-size: 12px;"> code </summary>
 
 ``` bash
 #download first and second set of qiime imported qza reads
@@ -98,6 +91,7 @@ qiime cutadapt trim-single \
    --o-trimmed-sequences sequences/fmt-tutorial-demux-2_trimmed.qza
 ```
 </details>
+</details>
 
 <details>
 
@@ -168,7 +162,6 @@ qiime feature-table tabulate-seqs \
   --o-visualization mergedRepSequences/rep-seqs.qzv
 ```
 </details>
-
 
 
 </details>
