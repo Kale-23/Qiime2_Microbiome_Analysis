@@ -1,8 +1,14 @@
 # gen711_final
 
-<details> <summary><H2> Background </H2></summary>
+<details open> <summary><H2> Background </H2></summary>
+
+Data taken from [this](https://doi.org/10.1186/s40168-016-0225-7) Human microbiome study was used to perform a bioinformatic pathway analysis based on [this](https://docs.qiime2.org/2022.2/tutorials/fmt/) tutorial by qiime2. Overall, my goal during this process was to learn how to take raw fastq reads and turn them into results that can be shared through analysis and figures generated using bioinformatic techniques. To start, my goal was to see the overall phylogenetic relationship of all included microbiota by generating a phylogenetic tree. 
+
+ Later in the analysis, I began to see more questions that I could ask about the given data (such as [this](https://forum.qiime2.org/t/tutorial-integrating-qiime2-and-r-for-data-visualization-and-analysis-using-qiime2r/4121) tutorial on PCA analysis of microbiome data), and I experimented with tools in qiime2's library and beyond that could potentially answer these questions. Most of these tools I have not had the opprotunity to finish learning before the project is due, but I plan to continue learning how to use them for future projects.
 
 </details>
+
+[//]: # "End Background"
 
 
 <details> <summary><H2> Methods </H2></summary>
@@ -10,11 +16,14 @@
 <details> <summary><H3> Downloading Data </H3></summary>
 
 Tools Used
+- [fastp](https://github.com/OpenGene/fastp)
 - import
 - cutadapt
 - demux summarize
 
 <details> <summary><i> code </i></summary>
+
+- This is for the 10% subsample data from [the qiime2 FMT tutorial](https://docs.qiime2.org/2022.2/tutorials/fmt/) and is already in qza format:
 
 ``` bash
 #download first and second set of qiime imported qza reads
@@ -36,8 +45,9 @@ qiime demux summarize \
   --i-data sequences/fmt-tutorial-demux-2.qza \
   --o-visualization sequences/demux-summary-2.qzv
 ```
-- This is for the 10% subsample data from [the qiime2 FMT tutorial](https://docs.qiime2.org/2022.2/tutorials/fmt/) and is already in qza format
+
 - If I were to start with the data given in lab, the following code would be run:
+
 ``` bash
 #download the fastp command for single end reads
 cp /tmp/gen711_project_data/fastp-single.sh .
@@ -63,8 +73,8 @@ curl -sL \
   "metadata/sample-metadata.tsv"
 
 #import both sets into qiime readable qza format
-qiime tools import \
 mkdir sequences
+qiime tools import \
    --type "SampleData[SequencesWithQuality]" \
    --input-format CasavaOneEightSingleLanePerSampleDirFmt \
    --input-path trimmed_fastqs1 \
@@ -93,8 +103,7 @@ qiime cutadapt trim-single \
    --verbose \
    --o-trimmed-sequences sequences/fmt-tutorial-demux-2_trimmed.qza
 ```
-</details>
-</details>
+</details></details>
 
 <details>
 
@@ -136,8 +145,7 @@ qiime metadata tabulate \
   --m-input-file repSequences/stats-2.qza \
   --o-visualization repSequences/denoising-stats-2.qzv
 ```
-</details>
-</details>
+</details></details>
 
 <details> <summary><H3> Merging Data </H3></summary>
 
@@ -173,8 +181,16 @@ qiime feature-table tabulate-seqs \
   --i-data mergedRepSequences/rep-seqs.qza \
   --o-visualization mergedRepSequences/rep-seqs.qzv
 ```
-</details>
-</details>
+</details></details>
 
 </details>
+
+[//]: # "End Methods"
+
+<details> <summary><H2> Results </H2></summary>
+
+stuff
+
 </details>
+
+[//]: # "End Results"
