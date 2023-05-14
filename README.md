@@ -30,6 +30,15 @@ curl -sL \
 curl -sL \
     "https://data.qiime2.org/2022.2/tutorials/fmt/fmt-tutorial-demux-2-10p.qza" > \
     "sequences/fmt-tutorial-demux-2.qza"
+
+#human readable output summary of sequences given to determine best way to denoise
+qiime demux summarize \
+  --i-data sequences/fmt-tutorial-demux-1.qza \
+  --o-visualization sequences/demux-summary-1.qzv
+
+qiime demux summarize \
+  --i-data sequences/fmt-tutorial-demux-2.qza \
+  --o-visualization sequences/demux-summary-2.qzv
 ```
 - This is for the 10% subsample data from [the qiime2 FMT tutorial](https://docs.qiime2.org/2022.2/tutorials/fmt/) and is already in qza format
 - If I were to start with the data given in lab, the following code would be run:
@@ -87,15 +96,6 @@ qiime cutadapt trim-single \
    --p-match-adapter-wildcards \
    --verbose \
    --o-trimmed-sequences sequences/fmt-tutorial-demux-2_trimmed.qza
-
-#human readable output summary of sequences given to determine best way to denoise
-qiime demux summarize \
-  --i-data sequences/fmt-tutorial-demux-1.qza \
-  --o-visualization sequences/demux-summary-1.qzv
-
-qiime demux summarize \
-  --i-data sequences/fmt-tutorial-demux-2.qza \
-  --o-visualization sequences/demux-summary-2.qzv
 ```
 </details>
 
