@@ -268,6 +268,36 @@ qiime taxa barplot \
 ```
 </details></details>
 
+<details> <summary><H3> Tree Creation </H3></summary>
+
+Tools Used:
+   - phylogeny fasttree
+      - uses fasttree to make an unrooted tree with the aligned sequences
+   - phylogeny midpoint-root
+      - uses fasttree to make rooted tree
+
+
+<details> <summary><i> code </i></summary>
+
+``` bash
+#creating unrooted tree
+mkdir tree
+qiime phylogeny fasttree \
+   --i-alignment alignedSequences/masked-aligned-sequences.qza \
+   --o-tree tree/unrooted-tree.qza
+
+#creating rooted tree 
+qiime phylogeny midpoint-root \
+   --i-tree tree/unrooted-tree.qza \
+   --o-rooted-tree tree/rooted-tree.qza
+
+qiime empress tree-plot \
+   --i-tree tree/rooted-tree.qza \
+   --m-feature-metadata-file taxonomy/taxonomy.qza \
+   --o-visualization tree/empress-tree-tax.qzv
+```
+
+</details></details>
 
 </details>
 
@@ -280,3 +310,28 @@ stuff
 </details>
 
 [//]: # "End Results"
+
+<details> <summary><H2> Helpful Links and Bibliography </H2></summary>
+
+- project is based off of the [qiime2 FMT tutorial](https://docs.qiime2.org/2022.2/tutorials/fmt/)
+
+- [original paper](https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-016-0225-7#Sec25) where data is from
+
+- [qiime2 overview](https://github.com/qiime2/docs/blob/master/source/tutorials/overview.rst) in github provides some nice visualizations about the bioinformatic pathway it provides
+
+<details> <summary> example visualization </summary>
+
+![example of picture showing bioinformatic pathway](https://github.com/qiime2/docs/raw/master/source/tutorials/images/overview.png)
+
+</details>
+
+- [Silva classifier list](https://zenodo.org/record/6395539#.ZGE7pHbMJhE)
+
+- helpful [example workflow](https://bioinformaticsworkbook.org/dataAnalysis/Metagenomics/Qiime2.html#gsc.tab=0) of similar study in qiime2
+
+- [chatGPT3](https://chat.openai.com/) helps explain what all the outputs mean and what can be done wtih them instead of searching through qiime2 documentation
+   - often wrong about stuff so double check what it says
+
+</details>
+
+[//]: # "End Helpful Links and Bibliography"
