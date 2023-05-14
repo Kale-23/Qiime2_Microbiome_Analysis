@@ -1,17 +1,20 @@
 # gen711_final
 
-## Background
+<details> <summary><H2> Background </H2></summary>
+
+</details>
 
 
-## Methods
+<details> <summary><H2> Methods </H2></summary>
 
-<details>
+<details> <summary><H3> Downloading Data </H3></summary>
 
-<summary> Downloading Data </summary>
+Tools Used
+- import
+- cutadapt
+- demux summarize
 
-<details>
-
-<summary> <H1> code </H1></summary>
+<details> <summary><i> code </i></summary>
 
 ``` bash
 #download first and second set of qiime imported qza reads
@@ -95,9 +98,14 @@ qiime cutadapt trim-single \
 
 <details>
 
-<summary> Denoising </summary>
+<summary><H3> Denoising </H3></summary>
 
-### Denoising
+Tools Used
+- denoise-single
+- metadata tabulate
+
+<details> <summary><i> code </i></summary>
+
 ``` bash
 #DADA used for denoising
 mkdir repSequences
@@ -129,12 +137,16 @@ qiime metadata tabulate \
   --o-visualization repSequences/denoising-stats-2.qzv
 ```
 </details>
+</details>
 
-<details>
+<details> <summary><H3> Merging Data </H3></summary>
 
-<summary> Merging Data </summary>
+Tools Used
+- feature-table merge
+- feature-table merge-seqs
+- feature-table summarize
 
-## Merging Data
+<details> <summary><i> code </i></summary>
 
 ``` bash
 mkdir mergedRepSequences
@@ -162,6 +174,7 @@ qiime feature-table tabulate-seqs \
   --o-visualization mergedRepSequences/rep-seqs.qzv
 ```
 </details>
+</details>
 
-
+</details>
 </details>
