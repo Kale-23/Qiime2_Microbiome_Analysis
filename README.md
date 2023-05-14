@@ -7,11 +7,11 @@
 
 <details>
 
-<summary style="font-size: 18px;"> Downloading Data </summary>
+<summary> Downloading Data </summary>
 
 <details>
 
-<summary style="font-size: 12px;"> code </summary>
+<summary> <H1> code </H1></summary>
 
 ``` bash
 #download first and second set of qiime imported qza reads
