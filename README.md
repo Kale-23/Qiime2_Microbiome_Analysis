@@ -275,6 +275,10 @@ Tools Used:
       - uses fasttree to make an unrooted tree with the aligned sequences
    - phylogeny midpoint-root
       - uses fasttree to make rooted tree
+   - empress tree-plot
+      - combines taxonomic information with tree
+   - empress community-plot
+      - combines taxonomy
 
 
 <details> <summary><i> code </i></summary>
@@ -291,10 +295,21 @@ qiime phylogeny midpoint-root \
    --i-tree tree/unrooted-tree.qza \
    --o-rooted-tree tree/rooted-tree.qza
 
+#adds taxonomic data to tree
+#learning how to actually use conda and installing qiime2/empress is a pain in the ass
+#please get empress onto ron
 qiime empress tree-plot \
    --i-tree tree/rooted-tree.qza \
    --m-feature-metadata-file taxonomy/taxonomy.qza \
    --o-visualization tree/empress-tree-tax.qzv
+
+#adds metadata and taxonomic data to tree
+qiime empress community-plot \
+   --i-tree tree/rooted-tree.qza \
+   --i-feature-table mergedRepSequences/table.qza \
+   --m-sample-metadata-file metadata/sample-metadata.tsv \
+   --m-feature-metadata-file taxonomy/taxonomy.qza \
+   --o-visualization tree/empress-tree-tax-table.qzv
 ```
 
 </details></details>
