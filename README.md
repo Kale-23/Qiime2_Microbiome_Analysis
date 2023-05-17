@@ -129,7 +129,7 @@ Tools Used
 <details> <summary><i> code </i></summary>
 
 ``` bash
-#DADA used for denoising
+#DADA2 used for denoising
 mkdir repSequences
 qiime dada2 denoise-single \
   --p-trim-left 13 \
@@ -310,6 +310,32 @@ qiime empress community-plot \
    --m-sample-metadata-file metadata/sample-metadata.tsv \
    --m-feature-metadata-file taxonomy/taxonomy.qza \
    --o-visualization tree/empress-tree-tax-table.qzv
+```
+
+</details></details>
+
+<details> <summary><H3> Diversity Analysis </H3></summary>
+
+Tools Used:
+   - diversity core-metrics-phylogenetic
+      - produces alpha and beta diversity metrics and visualizations
+      - sampling depth determined from data2 table output
+
+<details> <summary><i> code </i></summary>
+
+``` bash
+#produce alpha and beta diversity metrics and visualizations
+#output-dir is created during run
+qiime diversity core-metrics-phylogenetic \
+  --i-phylogeny tree/rooted-tree.qza \
+  --i-table mergedRepSequences/table.qza \
+  --p-sampling-depth 876 \
+  --m-metadata-file metadata/sample-metadata.tsv  \
+  --p-n-jobs-or-threads 10 \
+  --output-dir core-metrics
+
+
+
 ```
 
 </details></details>
