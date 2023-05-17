@@ -295,9 +295,11 @@ qiime phylogeny midpoint-root \
    --i-tree tree/unrooted-tree.qza \
    --o-rooted-tree tree/rooted-tree.qza
 
+#if empress is not installed (learning how to actually use conda and installing qiime2/empress is a pain in the ass, please get empress onto ron)
+pip install empress
+qiime dev refresh-cache
+
 #adds taxonomic data to tree
-#learning how to actually use conda and installing qiime2/empress is a pain in the ass
-#please get empress onto ron
 qiime empress tree-plot \
    --i-tree tree/rooted-tree.qza \
    --m-feature-metadata-file taxonomy/taxonomy.qza \
@@ -333,9 +335,7 @@ qiime diversity core-metrics-phylogenetic \
   --m-metadata-file metadata/sample-metadata.tsv  \
   --p-n-jobs-or-threads 10 \
   --output-dir core-metrics
-
-
-
+#nobody is on ron at 3 in the morning so I get to use all the cores :)
 ```
 
 </details></details>
@@ -369,6 +369,8 @@ stuff
 - [Silva classifier list](https://zenodo.org/record/6395539#.ZGE7pHbMJhE)
 
 - helpful [example workflow](https://bioinformaticsworkbook.org/dataAnalysis/Metagenomics/Qiime2.html#gsc.tab=0) of similar study in qiime2
+
+- helpful [youtube playlist](https://www.youtube.com/playlist?list=PLbVDKwGpb3XmkQmoBy1wh3QfWlWdn_pTT) from the qiime2 youtube channel
 
 - [chatGPT3](https://chat.openai.com/) helps explain what all the outputs mean and what can be done wtih them instead of searching through qiime2 documentation
    - often wrong about stuff so double check what it says
