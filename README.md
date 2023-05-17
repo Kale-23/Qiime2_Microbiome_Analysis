@@ -319,6 +319,9 @@ qiime empress community-plot \
 <details> <summary><H3> Diversity Analysis </H3></summary>
 
 Tools Used:
+   - feature-table filter-samples
+      - filters samples based on input
+      - here is used to get rid of donors because we just want to compare treatment vs control
    - diversity core-metrics-phylogenetic
       - produces alpha and beta diversity metrics and visualizations
       - sampling depth determined from data2 table output
@@ -326,16 +329,96 @@ Tools Used:
 <details> <summary><i> code </i></summary>
 
 ``` bash
+#remove donor by selecting for control and treatment
+#I think "[treatment-group] NOT IN ('donor')" works but I don't know SQL
+qiime feature-table filter-samples \
+   --i-table mergedRepSequences/table.qza \
+   --m-metadata-file metadata/sample-metadata.tsv \
+   --p-where "[treatment-group] IN ('control', 'treatment')" \
+   --o-filtered-table mergedRepSequences/no-donor-table.qza
+
 #produce alpha and beta diversity metrics and visualizations
 #output-dir is created during run
 qiime diversity core-metrics-phylogenetic \
   --i-phylogeny tree/rooted-tree.qza \
-  --i-table mergedRepSequences/table.qza \
+  --i-table mergedRepSequences/no-donor-table.qza \
   --p-sampling-depth 876 \
   --m-metadata-file metadata/sample-metadata.tsv  \
-  --p-n-jobs-or-threads 10 \
+  --p-n-jobs-or-threads 5 \
   --output-dir core-metrics
-#nobody is on ron at 3 in the morning so I get to use all the cores :)
+
+mkdir alphaDiversity
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity core-metrics/observed_features_vector.qza \
+  --m-metadata-file metadata/sample-metadata.tsv \
+  --o-visualization alphaDiversity/alpha-group-sig-obs-feats.qzv
+
+qiime longitudinal linear-mixed-effects \
+  --m-metadata-file metadata/sample-metadata.tsv core-metrics/observed_features_vector.qza \
+  --p-state-column week \
+  --p-group-columns treatment-group \
+  --p-individual-id-column subject-id \
+  --p-metric observed_features \
+  --o-visualization alphaDiversity/week-treatmentVScontrol.qzv
+
+qiime diversity umap \
+  --i-distance-matrix core-metrics/unweighted_unifrac_distance_matrix.qza \
+  --o-umap core-metrics/uu-umap.qza
+
+qiime diversity umap \
+  --i-distance-matrix core-metrics/weighted_unifrac_distance_matrix.qza \
+  --o-umap core-metrics/wu-umap.qza
+```
+
+-Using R to remove NaN values so the next step will work
+``` R
+#readr for tsv import, dplyr for filtering
+library(readr)
+library(dplyr)
+
+setwd("path to metadata")
+
+df <- read_tsv("metadata/sample-metadata.tsv")
+
+#removes columns with NaN values
+df2 <- df %>%
+  select(-c("gsrs", "gsrs-diff", "administration-route"))
+
+write_tsv(df2, "metadata/clean-metadata.tsv")
+```
+
+``` bash
+
+qiime feature-table filter-samples \
+   --i-table mergedRepSequences/table.qza \
+   --m-metadata-file metadata/clean-metadata.tsv \
+   --p-where "[treatment-group] IN ('control', 'treatment')" \
+   --o-filtered-table mergedRepSequences/clean-no-donor-table.qza
+
+qiime feature-table filter-samples \
+   --i-table mergedRepSequences/no-donor-table.qza \
+   --m-metadata-file metadata/sample-metadata.tsv \
+   --p-where "[treatment-group] IN ('control', 'treatment')" \
+   --o-filtered-table mergedRepSequences/no-donor-table.qza
+
+qiime taxa collapse \
+  --i-table mergedRepSequences/no-donor-table.qza \
+  --i-taxonomy taxonomy/taxonomy.qza \
+  --p-level 6 \
+  --o-collapsed-table mergedRepSequences/no-donor-genus-table.qza
+
+qiime feature-table relative-frequency \
+  --i-table mergedRepSequences/no-donor-genus-table.qza \
+  --o-relative-frequency-table mergedRepSequences/no-donor-genus-relFreq-table.qza
+
+mkdir longitudinal
+qiime longitudinal volatility \
+  --i-table mergedRepSequences/no-donor-genus-relFreq-table.qza \
+  --p-state-column week \
+  --m-metadata-file metadata/sample-metadata.tsv core-metrics/uu-umap.qza core-metrics/faith_pd_vector.qza core-metrics/evenness_vector.qza core-metrics/shannon_vector.qza \
+  --p-individual-id-column subject-id \
+  --p-default-group-column treatment-group \
+  --o-visualization longitudinal/volatility-plot-1.qzv
 ```
 
 </details></details>
