@@ -4,7 +4,7 @@
 
 Data taken from [this](https://doi.org/10.1186/s40168-016-0225-7) Human microbiome study was used to perform a bioinformatic pathway analysis based on [this](https://docs.qiime2.org/2022.2/tutorials/fmt/) tutorial by qiime2. Overall, my goal during this process was to learn how to take raw fastq reads and turn them into results that can be shared through analysis and figures generated using bioinformatic techniques.
 
-Final Presentation found [here](presentation/gen711_final_presentation.md)
+Final Presentation found [here](presentation/)
 
  <i> all code used for this project can be found under the code tabs in the method sections (I did not include an overall script.sh file because it is messy and I cannot find anything when I need to redo steps) </i>
 
