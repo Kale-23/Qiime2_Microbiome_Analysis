@@ -124,7 +124,7 @@ Tools Used
       - which reads were filtered, how many were denoised, and how many were non-chimeric
 - feature-table tabulate-seqs
    - outputs table of all features and their sequences and lengths
-   
+
 <details> <summary><i> code </i></summary>
 
 ``` bash
@@ -333,6 +333,30 @@ Tools Used:
    - diversity core-metrics-phylogenetic
       - produces alpha and beta diversity metrics and visualizations
       - sampling depth determined from data2 table output
+   - diversity alpha-rarefaction
+      - plots diversity against sequence depth
+      - can be used to determine if selected sequence depth in previous command was enough to keep most species diversity within the samples
+   - diversity alpha-group-significance
+      - plots the diversity metric against variables in the metadata
+   - longitudinal linear-mixed-effects
+      - linear model mixed effect of two selected variables
+      - used here to compare treatment + week vs alpha diveristy
+   - diversity umap
+      - reduces dimensions in the provided beta diversity method input
+      - used here with unweighted/weighted unifrac
+   - emperor plot
+      - scatterplot with metadata
+      - used to plot umap results of unifrac beta method
+   - R
+      - used to remove metadata columns with missing data
+         - dplyr to filter using select(-c())
+      - probably could use feature-table filter-samples but I don't know SQL
+   - taxa collapse
+      - adds taxonomic data to feature table
+   - feature-table relative-frequency
+      - converts values in feature table to relative frequencies
+   - longitudinal volatility
+      - creates longitudinal plot with provided diversity metrics, metadata, relative frequencies, and taxonomic information
 
 <details> <summary><i> code </i></summary>
 
@@ -355,13 +379,23 @@ qiime diversity core-metrics-phylogenetic \
   --p-n-jobs-or-threads 5 \
   --output-dir core-metrics
 
-#
+#determine if depth is good enough to continue
+qiime diversity alpha-rarefaction \
+    --i-table mergedRepSequences/clean-no-donor-table.qza \
+    --i-phylogeny tree/rooted-tree.qza \
+    --p-max-depth 876 \
+    --m-metadata-file metadata/sample-metadata.tsv \
+    --o-visualization core-metrics/rarefaction.qzv \
+    --verbose
+
+#creates alpha diversity boxplots using observed features
 mkdir alphaDiversity
 qiime diversity alpha-group-significance \
   --i-alpha-diversity core-metrics/observed_features_vector.qza \
   --m-metadata-file metadata/sample-metadata.tsv \
   --o-visualization alphaDiversity/alpha-group-sig-obs-feats.qzv
 
+#creates alpha diversity linear mixed effects plot and summary
 qiime longitudinal linear-mixed-effects \
   --m-metadata-file metadata/sample-metadata.tsv core-metrics/observed_features_vector.qza \
   --p-state-column week \
@@ -370,6 +404,7 @@ qiime longitudinal linear-mixed-effects \
   --p-metric observed_features \
   --o-visualization alphaDiversity/week-treatmentVScontrol.qzv
 
+#reduces the dimensions of the unifrac beta diverisity metric
 qiime diversity umap \
   --i-distance-matrix core-metrics/unweighted_unifrac_distance_matrix.qza \
   --o-umap core-metrics/uu-umap.qza
@@ -378,6 +413,7 @@ qiime diversity umap \
   --i-distance-matrix core-metrics/weighted_unifrac_distance_matrix.qza \
   --o-umap core-metrics/wu-umap.qza
 
+#plots the umap
 qiime emperor plot \
   --i-pcoa core-metrics/uu-umap.qza \
   --m-metadata-file metadata/sample-metadata.tsv core-metrics/uu-umap.qza core-metrics/faith_pd_vector.qza core-metrics/evenness_vector.qza core-metrics/shannon_vector.qza \
@@ -401,8 +437,8 @@ df <- read_tsv("metadata/sample-metadata.tsv")
 df2 <- df %>%
    select(-c("gsrs", "gsrs-diff", "administration-route"))
 
+#somehow these together remove the Na values R puts in tsv outputs
 df2[is.na(df2)] <- ""
-
 write_tsv(df2, "metadata/clean-metadata.tsv", na = "")
 ```
 

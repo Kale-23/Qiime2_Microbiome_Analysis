@@ -148,7 +148,7 @@ Original Data from:
 - first, R was used to filter out metadata columns with missing values
 - `feature-table filter-samples` was used to remove donor values from the metadata
     - the next steps cannot have null values
-- core diversity metrics were generated using `core-metrics-phylogenetic`
+- core diversity metrics were generated using `diversity core-metrics-phylogenetic`
     - alpha: observed features, Faith's Phylogenetic Diversity, Shannon Diversity, Pielou's evenness
         - within sample diversity
     - beta: UniFrac, Jaccard, Bray-Curtis
@@ -161,11 +161,45 @@ Original Data from:
 
 ### Rarefaction Plot
 
-- shows if selected sequencing depth used in previous step (876) likely contains majority of the species present
+- generated with `diversity alpha-rarefaction`
+- shows if selected sequencing depth contains majority of the species present
+
 ![bg right:65% fit](../plots/rarefaction.png)
 
 ---
 
 # Methods
 
+### Alpha Diversity
+
+- `diversity alpha-group-significance` used to create boxplots with observed features alpha metric against metadata variables
+- `longitudinal linear-mixed-effects` used to create linear mixed effects model to probe further into the treatment group relationship seen in the boxplots
+
+---
+
+# Results
+
+### Alpha Diversity
+
+- Observed Features metric
+- Shows microbiome richness differences between groups
+
+![bg right:60% fit](../plots/alpha-group-sig-obs-feats.png)
+
+---
+
+# Results
+
+### Alpha Diversity
+
+- Treatment + Time only significant predictor of microbiome richness
+- As time progressed, the treatment group's microbiome became more diverse
+
+![bg right:60% fit](../plots/week-treatmentVScontrol.png)
+
+---
+
+# Methods
+
+### Beta Diversity
 
