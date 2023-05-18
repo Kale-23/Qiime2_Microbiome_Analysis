@@ -4,6 +4,8 @@
 
 Data taken from [this](https://doi.org/10.1186/s40168-016-0225-7) Human microbiome study was used to perform a bioinformatic pathway analysis based on [this](https://docs.qiime2.org/2022.2/tutorials/fmt/) tutorial by qiime2. Overall, my goal during this process was to learn how to take raw fastq reads and turn them into results that can be shared through analysis and figures generated using bioinformatic techniques.
 
+Final Presentation found [here](presentation/gen711_final_presentation.md)
+
  <i> all code used for this project can be found under the code tabs in the method sections (I did not include an overall script.sh file because it is messy and I cannot find anything when I need to redo steps) </i>
 
 </details>
@@ -481,7 +483,95 @@ qiime longitudinal volatility \
 
 <details> <summary><H2> Results </H2></summary>
 
-stuff
+these are just a couple examples of what can be done with the above analysis
+
+<details> <summary><H3> Demultiplexed Sequences Summary </H3></summary>
+
+![](plots/demux-summary-1.png)
+
+Shows the average quality scores of the sequences. Helpful in determining what sequences to cut out in the denoising steps. This run specifically has low scores from bases 1 to 13, and at the 151 position.
+
+</details>
+
+<details> <summary><H3> Phylogenetic Tree </H3></summary>
+
+![](plots/empress-tree.svg)
+
+Shows the phylogenetic relationships of the taxa gathered from database comparison between 16S rRNA V4 features and SILVA database. This plot has branches colored by thier Class, and the outside ring colored by treatment group (Orange = Treatment, Red = Control, Blue = Donor). This plot shows an ultrametric circular view of the phylogenetic tree.
+
+Empress (The program used to create this) allows control of branch color from Domain to Genus, as well as by any variables outlined in the metadata. 
+
+</details>
+
+<details> <summary><H3> Rarefaction Plot </H3></summary>
+
+![](plots/rarefaction.png)
+
+Shows the alpha diversity metric on the y axis and number of sequences on the x axis. This plot allows us to know if the current sequencing depth is sufficient to contain the majority of species diversity seen within the full sample set when running diversity analyses. This plot specifically shows the Shannon diversity metric on the y axis. The metric tops out around 200 sequencing depth while we used a depth of 876. This means that most of the diversity was contained in this subset of the data selected and more in depth analyses can be run.
+
+</details>
+
+<details> <summary><H3> Alpha Diversity </H3></summary>
+
+<details> <summary><i> boxplot </i></summary>
+
+![](plots/alpha-group-sig-obs-feats.png)
+
+Shows an alpha diversity metric on the y axis, and a metadata variable on the x. This specific plot shows the observed features metric vs treatment group.
+
+</details>
+
+<details> <summary><i> Mixed Linear Model </i></summary>
+
+![](plots/week-treatmentVScontrol.png)
+
+Shows an alpha diversity metric on the y axis, and a metadata variable on the x, with a linear model prediction on another metadata variable. In this plot specifically, the model is predicting how treatment group and time (weeks) effects the observed features metric. In this case, only the treatment x time is significant in predicting observed features. This means that as time advances, the treatment group will hav a more diverse gut microbiome.
+
+</details>
+
+</details>
+
+<details> <summary><H3> Beta Diversity </H3></summary>
+
+<details> <summary><i> UMAP 1 </i></summary>
+
+![](plots/wu-umap-emperor-cropped.svg)
+
+Plots a beta diversity metric with reduced dimensionality along two axes. Can change colors and shapes of each point based off of variables within the metadata. This plot specifically plots weighted UniFrac, with shapes seperating sample colection method (star = swab, square = stool), and color representing Pielou's Evenness, continuous from purple to yellow. We can see that collection methods form seperate groups, and the evenness goes from mainly yellow to purple from left to right. There are two groups here, but I could not figure out why based on the metadata or alpha diversity metrics, so there is something else that is pulling these groups apart.
+
+</details>
+
+<details> <summary><i> UMAP 2 </i></summary>
+
+![](plots/uu-umap-emperor-cropped.svg)
+
+This plot specifically plots unweighted UniFrac, with each color representing a single subject. Each subject is clustered around their own samples.
+
+</details>
+
+</details>
+
+<details> <summary><H3> Volatility Control Charts </H3></summary>
+
+<details> <summary><i> Chart 1 </i></summary>
+
+![](plots/volatility-plot-alpha-collection-method.svg)
+
+Plots lines of any variable from the metadata, diversity metrics, or taxonomic groups against any other from those groups, split into groups by yet another from those groups.
+
+This specific plot plots Shannon Entropy on the y axis, Time on the x axis, and grouped by sample collection method. The stool samples consistantly held more richness compared to swab samples over time
+
+</details>
+
+<details> <summary><i> Chart 2 </i></summary>
+
+![](plots/vilatility-plot-taxa-treatment.svg)
+
+This specific plot plots a bacterial Family on the y axis, time on the x axis, and grouped by treatment group. The bacterial family was seen in both groups across time. This type of comparison can be done with any group from any taxonomic level down to genus if it was matched within the database used.
+
+</details>
+
+</details>
 
 </details>
 
@@ -503,9 +593,11 @@ stuff
 
 - [Silva classifier list](https://zenodo.org/record/6395539#.ZGE7pHbMJhE)
 
-- helpful [example workflow](https://bioinformaticsworkbook.org/dataAnalysis/Metagenomics/Qiime2.html#gsc.tab=0) of similar study in qiime2
+- [example workflow](https://bioinformaticsworkbook.org/dataAnalysis/Metagenomics/Qiime2.html#gsc.tab=0) of similar study in qiime2
 
-- helpful [youtube playlist](https://www.youtube.com/playlist?list=PLbVDKwGpb3XmkQmoBy1wh3QfWlWdn_pTT) from the qiime2 youtube channel
+- [youtube playlist](https://www.youtube.com/playlist?list=PLbVDKwGpb3XmkQmoBy1wh3QfWlWdn_pTT) from the qiime2 youtube channel
+
+- [Marp](https://marpit.marp.app/markdown) documents for making the presentation in markdown
 
 - [chatGPT3](https://chat.openai.com/) helps explain what all the outputs mean and what can be done wtih them instead of searching through qiime2 documentation
    - often wrong about stuff so double check what it says
