@@ -2,16 +2,13 @@
 
 <details open> <summary><H2> Background </H2></summary>
 
-Data taken from [this](https://doi.org/10.1186/s40168-016-0225-7) Human microbiome study was used to perform a bioinformatic pathway analysis based on [this](https://docs.qiime2.org/2022.2/tutorials/fmt/) tutorial by qiime2. Overall, my goal during this process was to learn how to take raw fastq reads and turn them into results that can be shared through analysis and figures generated using bioinformatic techniques. To start, my goal was to see the overall phylogenetic relationship of all included microbiota by generating a phylogenetic tree. 
-
- Later in the analysis, I began to see more questions that I could ask about the given data (such as [this](https://forum.qiime2.org/t/tutorial-integrating-qiime2-and-r-for-data-visualization-and-analysis-using-qiime2r/4121) tutorial on PCA analysis of microbiome data), and I experimented with tools in qiime2's library and beyond that could potentially answer these questions. Most of these tools I have not had the opprotunity to finish learning before the project is due, but I plan to continue learning how to use them for future projects.
+Data taken from [this](https://doi.org/10.1186/s40168-016-0225-7) Human microbiome study was used to perform a bioinformatic pathway analysis based on [this](https://docs.qiime2.org/2022.2/tutorials/fmt/) tutorial by qiime2. Overall, my goal during this process was to learn how to take raw fastq reads and turn them into results that can be shared through analysis and figures generated using bioinformatic techniques.
 
  <i> all code used for this project can be found under the code tabs in the method sections (I did not include an overall script.sh file because it is messy and I cannot find anything when I need to redo steps) </i>
 
 </details>
 
 [//]: # "End Background"
-
 
 <details> <summary><H2> Methods </H2></summary>
 
@@ -55,7 +52,7 @@ qiime demux summarize \
   --o-visualization sequences/demux-summary-2.qzv
 ```
 
-- If I were to start with the data given in lab, the following code would be run:
+- Steps below are for if the raw fastq files were used:
 
 ``` bash
 #download the fastp command for single end reads
@@ -125,7 +122,9 @@ Tools Used
 - metadata tabulate
    - outputs table of stats, not nessesary to continue but cool statistics to know
       - which reads were filtered, how many were denoised, and how many were non-chimeric
-
+- feature-table tabulate-seqs
+   - outputs table of all features and their sequences and lengths
+   
 <details> <summary><i> code </i></summary>
 
 ``` bash
@@ -157,6 +156,15 @@ qiime metadata tabulate \
 qiime metadata tabulate \
   --m-input-file repSequences/stats-2.qza \
   --o-visualization repSequences/denoising-stats-2.qzv
+
+#showing feature sequences and length
+qiime feature-table tabulate-seqs \
+        --i-data repSequences/rep-seqs-1.qza \
+        --o-visualization repSequences/rep-seqs-1.qzv
+
+qiime feature-table tabulate-seqs \
+        --i-data repSequences/rep-seqs-2.qza \
+        --o-visualization repSequences/rep-seqs-2.qzv
 ```
 </details></details>
 
@@ -347,6 +355,7 @@ qiime diversity core-metrics-phylogenetic \
   --p-n-jobs-or-threads 5 \
   --output-dir core-metrics
 
+#
 mkdir alphaDiversity
 qiime diversity alpha-group-significance \
   --i-alpha-diversity core-metrics/observed_features_vector.qza \
@@ -368,57 +377,64 @@ qiime diversity umap \
 qiime diversity umap \
   --i-distance-matrix core-metrics/weighted_unifrac_distance_matrix.qza \
   --o-umap core-metrics/wu-umap.qza
+
+qiime emperor plot \
+  --i-pcoa core-metrics/uu-umap.qza \
+  --m-metadata-file metadata/sample-metadata.tsv core-metrics/uu-umap.qza core-metrics/faith_pd_vector.qza core-metrics/evenness_vector.qza core-metrics/shannon_vector.qza \
+  --o-visualization core-metrics/uu-umap-emperor.qzv
+
+qiime emperor plot \
+  --i-pcoa core-metrics/wu-umap.qza \
+  --m-metadata-file metadata/sample-metadata.tsv core-metrics/uu-umap.qza core-metrics/faith_pd_vector.qza core-metrics/evenness_vector.qza core-metrics/shannon_vector.qza \
+  --o-visualization core-metrics/wu-umap-emperor.qzv
 ```
 
 -Using R to remove NaN values so the next step will work
 ``` R
-#readr for tsv import, dplyr for filtering
+#readr for tsv impor/export, dplyr for filtering
 library(readr)
 library(dplyr)
 
-setwd("path to metadata")
-
 df <- read_tsv("metadata/sample-metadata.tsv")
 
-#removes columns with NaN values
+#these three rows have missing values that cause qiime2 viewer to not work in the longitudinal plot
 df2 <- df %>%
-  select(-c("gsrs", "gsrs-diff", "administration-route"))
+   select(-c("gsrs", "gsrs-diff", "administration-route"))
 
-write_tsv(df2, "metadata/clean-metadata.tsv")
+df2[is.na(df2)] <- ""
+
+write_tsv(df2, "metadata/clean-metadata.tsv", na = "")
 ```
 
 ``` bash
-
+#refilter table with the new metadata file
 qiime feature-table filter-samples \
    --i-table mergedRepSequences/table.qza \
    --m-metadata-file metadata/clean-metadata.tsv \
    --p-where "[treatment-group] IN ('control', 'treatment')" \
    --o-filtered-table mergedRepSequences/clean-no-donor-table.qza
 
-qiime feature-table filter-samples \
-   --i-table mergedRepSequences/no-donor-table.qza \
-   --m-metadata-file metadata/sample-metadata.tsv \
-   --p-where "[treatment-group] IN ('control', 'treatment')" \
-   --o-filtered-table mergedRepSequences/no-donor-table.qza
-
+#add taxinomic data to table
 qiime taxa collapse \
-  --i-table mergedRepSequences/no-donor-table.qza \
+  --i-table mergedRepSequences/clean-no-donor-table.qza \
   --i-taxonomy taxonomy/taxonomy.qza \
   --p-level 6 \
-  --o-collapsed-table mergedRepSequences/no-donor-genus-table.qza
+  --o-collapsed-table mergedRepSequences/clean-no-donor-genus-table.qza
 
+#converts counts to relative frequencies
 qiime feature-table relative-frequency \
-  --i-table mergedRepSequences/no-donor-genus-table.qza \
-  --o-relative-frequency-table mergedRepSequences/no-donor-genus-relFreq-table.qza
+  --i-table mergedRepSequences/clean-no-donor-genus-table.qza \
+  --o-relative-frequency-table mergedRepSequences/clean-no-donor-genus-relFreq-table.qza
 
+#creates longitudinal plot visualization
 mkdir longitudinal
 qiime longitudinal volatility \
-  --i-table mergedRepSequences/no-donor-genus-relFreq-table.qza \
+  --i-table mergedRepSequences/clean-no-donor-genus-relFreq-table.qza \
   --p-state-column week \
-  --m-metadata-file metadata/sample-metadata.tsv core-metrics/uu-umap.qza core-metrics/faith_pd_vector.qza core-metrics/evenness_vector.qza core-metrics/shannon_vector.qza \
+  --m-metadata-file metadata/clean-metadata.tsv core-metrics/uu-umap.qza core-metrics/faith_pd_vector.qza core-metrics/evenness_vector.qza core-metrics/shannon_vector.qza \
   --p-individual-id-column subject-id \
   --p-default-group-column treatment-group \
-  --o-visualization longitudinal/volatility-plot-1.qzv
+  --o-visualization longitudinal/volatility-plot.qzv
 ```
 
 </details></details>
